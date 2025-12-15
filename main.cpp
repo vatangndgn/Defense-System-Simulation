@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -10,7 +10,6 @@ protected:
     int hasargucu;
 
 public:
-  
     Muhimmat(string gelenisim, int gelenhasargucu) {
         isim = gelenisim;
         hasargucu = gelenhasargucu;
@@ -18,9 +17,11 @@ public:
 
     virtual void patla() = 0;
 
-    virtual ~Muhimmat() {
-        cout << isim << " bellekten cikartiliyor...\n";
-    }
+    int getHasar() const { return hasargucu; }
+    string getIsim() const { return isim; }
+
+    virtual ~Muhimmat() {}
+
 };
 
 class Roket : public Muhimmat {
@@ -28,7 +29,14 @@ public:
     Roket(string isim, int hasargucu) : Muhimmat(isim, hasargucu) {}
 
     void patla() override {
-        cout << isim << " hedefi vurdu! " << hasargucu << " hasar verildi.\n" << endl;
+        cout << "[ROKET] " << isim << " ateslendi! Hedefe " << hasargucu << " hasar verdi.\n";
+    }
+
+    Roket operator+(const Roket& digerRoket) {
+        int yeniGuc = this->hasargucu + digerRoket.hasargucu;
+        string yeniIsim = "MEGA-" + this->isim + "&" + digerRoket.isim;
+
+        return Roket(yeniIsim, yeniGuc);
     }
 };
 
@@ -37,31 +45,41 @@ public:
     Akillifuze(string isim, int hasargucu) : Muhimmat(isim, hasargucu) {}
 
     void patla() override {
-        cout << isim << " Hedefe Kilitlenildi.. Hedef vuruldu! " << hasargucu << " hasar verildi.\n" << endl;
+        cout << "[AKILLI FUZE] " << isim << " hedefe kilitlendi... VURUS! (Hasar: " << hasargucu << ")\n";
     }
 };
 
 int main() {
+    cout << "---ASELSAN HISAR SIMULASYONU---\n\n";
+
+    Roket r1("OMTAS", 100);
+    Roket r2("CIRIT", 150);
+
+    Roket superRoket = r1 + r2;
+
+    cout << "---ENVANTER DURUMU---\n";
+    r1.patla();
+    r2.patla();
+
+    cout << "\n---BIRLESTIRME ISLEMI---\n";
+    cout << "Sistem: Iki roket birlestiriliyor...\n";
+
+    superRoket.patla();
+
+    cout << "\n---POLYMORPHISM TESTI---\n";
+
     vector<Muhimmat*> envanter;
+    envanter.push_back(new Akillifuze("SOM-J", 500));
+    envanter.push_back(new Roket("BORA", 1000));
 
-    envanter.push_back(new Roket("Roket-01", 100));
-    envanter.push_back(new Akillifuze("AkilliFuze-01", 300));
-    envanter.push_back(new Roket("Roket-02", 120)); 
-
-    cout << "---OPERASYON BASLIYOR---\n\n";
-
-    for (size_t i = 0; i < envanter.size(); i++) {
-        envanter[i]->patla();
+    for (auto m : envanter) {
+        m->patla();
     }
 
-    cout << "---TEMIZLIK---\n";
-
-    for (size_t j = 0; j < envanter.size(); j++) {
-        delete envanter[j]; 
+    for (auto m : envanter) {
+        delete m;
     }
-
-    envanter.clear(); 
-    cout << "\nTum bellek temizlendi. Program kapaniyor.";
+    envanter.clear();
 
     return 0;
 }
